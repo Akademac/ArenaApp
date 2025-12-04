@@ -5,9 +5,14 @@ node_modules/
 
 # Expo
 .expo/
+.expo-shared/
 dist/
 web-build/
 expo-env.d.ts
+
+# Metro
+.metro/
+.metro-health-check*
 
 # Native
 .kotlin/
@@ -18,26 +23,46 @@ expo-env.d.ts
 *.key
 *.mobileprovision
 
-# Metro
-.metro-health-check*
-
-# debug
-npm-debug.*
-yarn-debug.*
-yarn-error.*
+# Android / iOS build folders
+/ios
+/android
+build/
+*.apk
+*.aab
 
 # macOS
 .DS_Store
-*.pem
+
+# Windows
+Thumbs.db
+
+# debug logs
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+*.log
 
 # local env files
-.env*.local
+.env
+.env.*.local
+.env.local
+.env.test
+.env.production
 
-# typescript
+# TypeScript
 *.tsbuildinfo
 
-app-example
+# Expo assets cache (optional but useful)
+assets/**/*.png.tmp
+assets/**/*.jpg.tmp
 
-# generated native folders
-/ios
-/android
+# VS Code
+.vscode/
+
+# temporary files
+*.tmp
+*.temp
+*.swp
+
+# Example app
+app-example
