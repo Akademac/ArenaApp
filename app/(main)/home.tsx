@@ -1,5 +1,6 @@
 import BottomActionBar from "@/components/BottomActionBar";
 import VoteCard from "@/components/VoteCard";
+import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
   Dimensions,
@@ -9,8 +10,7 @@ import {
   Pressable,
   Share,
   StyleSheet,
-  Text,
-  View,
+  View
 } from "react-native";
 
 const { height: SCREEN_HEIGHT } = Dimensions.get("window");
@@ -54,11 +54,10 @@ const MOCK_TOPICS: Duel[] = [
   },
 ];
 
-type ActiveTab = "comments" | "regions" | "trending" | null;
+type ActiveTab = "comments" | "regions" | "trending" | "profile" | "share" | null;
 
 export default function HomeScreen() {
   const [activeTab, setActiveTab] = useState<ActiveTab>(null);
-
   // ⭐ favorites po topic id-u
   const [favorites, setFavorites] = useState<Record<string, boolean>>({});
 
@@ -78,6 +77,10 @@ export default function HomeScreen() {
     }
   };
 
+  const onProfilePress = () => {
+    console.log('On profile press!')
+  }
+
   // 👇 ovde hvatamo PRAVI current duel
   
   const currentDuel =
@@ -87,7 +90,7 @@ export default function HomeScreen() {
 
   const handleShare = async () => {
     if (!currentDuel) return;
-
+    setActiveTab('share')
     try {
       await Share.share({
         message: `Glasaj u Areni: ${currentDuel.leftLabel} vs ${currentDuel.rightLabel} 🔥\n\n(Uskoro ovde ide pravi link ka duelu)`,
@@ -118,10 +121,14 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      {/* 👤 Profil ikonica gore desno */}
-      <Pressable style={styles.profileButton} onPress={handleProfilePress}>
-        <Text style={styles.profileIcon}>👤</Text>
-      </Pressable>
+          {/* 👤 PROFIL */}
+        <Pressable onPress={() => setActiveTab("profile")} style={styles.proflieIconButton}>
+          <Ionicons
+            name="person-outline"
+            size={26}
+           color={activeTab === "profile" ? "#FFE66D" : "#9BA4B4"}
+          />
+        </Pressable>
 
       <FlatList
         data={MOCK_TOPICS}
@@ -185,5 +192,14 @@ const styles = StyleSheet.create({
   profileIcon: {
     fontSize: 16,
     color: "#fff",
+  },
+    proflieIconButton: {
+    position: "absolute",
+    top: 40, // prilagodi zavisno od status bara / SafeArea
+    right: 16,
+    zIndex: 20,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+
   },
 });

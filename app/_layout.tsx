@@ -8,7 +8,8 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <AuthProvider>
-        <View style={{ flex: 1, backgroundColor: "#566130" }}>
+        <View style={{ flex: 1,     backgroundColor: "#030412",
+ }}>
           <Stack
             screenOptions={{
               headerShown: false,

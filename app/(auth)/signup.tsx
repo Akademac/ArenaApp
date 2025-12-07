@@ -1,112 +1,120 @@
-// app/(auth)/signup.tsx
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import { useState } from "react";
 import {
-  View,
+  Pressable,
+  StyleSheet,
   Text,
   TextInput,
-  StyleSheet,
-  TouchableOpacity,
-  ActivityIndicator,
-  Alert,
+  View,
 } from "react-native";
-import { useRouter } from "expo-router";
-import { useAuth } from "../../context/AuthContext";
 
-export default function SignupScreen() {
-  const router = useRouter();
-  const { signUp } = useAuth();
-
+export default function Signup() {
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
-  const [loading, setLoading] = useState(false);
 
-  const handleSignup = async () => {
-    if (!email || !password || !confirm) {
-      Alert.alert("Greška", "Popuni sva polja.");
-      return;
-    }
+  const [showPass, setShowPass] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
-    if (password !== confirm) {
-      Alert.alert("Greška", "Lozinke se ne poklapaju.");
-      return;
-    }
+  const handleSignup = () => {
+    console.log("SIGN UP:", { username, email, password });
+    // 🔥 ovde kasnije ide Firebase signup
+  };
 
-    if (password.length < 6) {
-      Alert.alert("Greška", "Lozinka mora imati bar 6 karaktera.");
-      return;
-    }
-
-    try {
-      setLoading(true);
-      await signUp(email.trim(), password);
-      // Ako uspe, vodi korisnika na main/home
-      router.replace("/(main)/home");
-    } catch (error: any) {
-      console.log("Sign up error:", error);
-      let message = "Nešto je pošlo naopako.";
-
-      if (error.code === "auth/email-already-in-use") {
-        message = "Ovaj email je već registrovan.";
-      } else if (error.code === "auth/invalid-email") {
-        message = "Email adresa nije validna.";
-      } else if (error.code === "auth/weak-password") {
-        message = "Lozinka je preslaba.";
-      }
-
-      Alert.alert("Greška pri registraciji", message);
-    } finally {
-      setLoading(false);
-    }
+  const handleGuest = () => {
+    router.replace("/(main)/home");
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Napravi nalog</Text>
+      {/* TITLE */}
+      <Text style={styles.title}>Create an Account</Text>
+      <Text style={styles.subtitle}>
+        Create your account in seconds and start voting now!
+      </Text>
 
+      {/* USERNAME */}
+      <Text style={styles.label}>User Name</Text>
       <TextInput
+        value={username}
+        onChangeText={setUsername}
+        placeholder="Your name"
+        placeholderTextColor="#9BA4B4"
         style={styles.input}
-        placeholder="Email"
-        placeholderTextColor="#888"
-        autoCapitalize="none"
-        keyboardType="email-address"
+      />
+
+      {/* EMAIL */}
+      <Text style={styles.label}>Your Email</Text>
+      <TextInput
         value={email}
         onChangeText={setEmail}
-      />
-
-      <TextInput
+        placeholder="hello@email.com"
+        placeholderTextColor="#9BA4B4"
         style={styles.input}
-        placeholder="Lozinka"
-        placeholderTextColor="#888"
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
+        keyboardType="email-address"
+        autoCapitalize="none"
       />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Potvrdi lozinku"
-        placeholderTextColor="#888"
-        secureTextEntry
-        value={confirm}
-        onChangeText={setConfirm}
-      />
+      {/* PASSWORD */}
+      <Text style={styles.label}>Create a Password</Text>
+      <View style={styles.passwordWrapper}>
+        <TextInput
+          value={password}
+          onChangeText={setPassword}
+          placeholder="********"
+          placeholderTextColor="#9BA4B4"
+          style={styles.passwordInput}
+          secureTextEntry={!showPass}
+        />
+        <Pressable onPress={() => setShowPass(!showPass)}>
+          <Ionicons
+            name={showPass ? "eye-off-outline" : "eye-outline"}
+            size={22}
+            color="#9BA4B4"
+          />
+        </Pressable>
+      </View>
+      <Text style={styles.helper}>Password must be at least 8 characters.</Text>
 
-      <TouchableOpacity
-        style={[styles.button, loading && styles.buttonDisabled]}
-        onPress={handleSignup}
-        disabled={loading}
-      >
-        {loading ? (
-          <ActivityIndicator color="#ffffff" />
-        ) : (
-          <Text style={styles.buttonText}>Registruj se</Text>
-        )}
-      </TouchableOpacity>
+      {/* CONFIRM */}
+      <Text style={styles.label}>Retype Password</Text>
+      <View style={styles.passwordWrapper}>
+        <TextInput
+          value={confirm}
+          onChangeText={setConfirm}
+          placeholder="********"
+          placeholderTextColor="#9BA4B4"
+          style={styles.passwordInput}
+          secureTextEntry={!showConfirm}
+        />
+        <Pressable onPress={() => setShowConfirm(!showConfirm)}>
+          <Ionicons
+            name={showConfirm ? "eye-off-outline" : "eye-outline"}
+            size={22}
+            color="#9BA4B4"
+          />
+        </Pressable>
+      </View>
+      <Text style={styles.helper}>Password must be at least 8 characters.</Text>
 
-      <TouchableOpacity onPress={() => router.push("/(auth)/login")}>
-        <Text style={styles.linkText}>Već imaš nalog? Uloguj se</Text>
-      </TouchableOpacity>
+      {/* SIGNUP BUTTON */}
+      <Pressable style={styles.signupButton} onPress={handleSignup}>
+        <Text style={styles.signupText}>Create Account</Text>
+      </Pressable>
+
+      {/* GUEST */}
+      <Pressable onPress={handleGuest}>
+        <Text style={styles.guestText}>Continue as Guest</Text>
+      </Pressable>
+
+      {/* LOGIN */}
+      <Pressable onPress={() => router.push("/(auth)/login")}>
+        <Text style={styles.loginText}>
+          Already have an account? <Text style={styles.loginLink}>Login</Text>
+        </Text>
+      </Pressable>
     </View>
   );
 }
@@ -116,43 +124,99 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#050816",
     paddingHorizontal: 24,
-    justifyContent: "center",
+    paddingTop: 80,
   },
+
   title: {
-    fontSize: 26,
-    fontWeight: "bold",
-    color: "#ffffff",
-    marginBottom: 24,
-    textAlign: "center",
+    color: "#FFFFFF",
+    fontSize: 32,
+    fontWeight: "800",
+    marginBottom: 6,
   },
+
+  subtitle: {
+    color: "#9BA4B4",
+    fontSize: 14,
+    marginBottom: 36,
+  },
+
+  label: {
+    color: "#FFFFFF",
+    fontSize: 13,
+    marginBottom: 6,
+    marginTop: 14,
+  },
+
   input: {
-    backgroundColor: "#111827",
-    borderRadius: 999,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    color: "#ffffff",
-    marginBottom: 12,
     borderWidth: 1,
-    borderColor: "#1f2937",
-  },
-  button: {
-    marginTop: 12,
-    backgroundColor: "#ef4444",
+    borderColor: "#1F2933",
+    borderRadius: 10,
+    paddingHorizontal: 14,
     paddingVertical: 14,
-    borderRadius: 999,
+    color: "#FFFFFF",
+    fontSize: 15,
+    backgroundColor: "#030412",
+  },
+
+  passwordWrapper: {
+    flexDirection: "row",
     alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#1F2933",
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    backgroundColor: "#030412",
   },
-  buttonDisabled: {
-    opacity: 0.7,
+
+  passwordInput: {
+    flex: 1,
+    paddingVertical: 14,
+    color: "#FFFFFF",
+    fontSize: 15,
   },
-  buttonText: {
-    color: "#ffffff",
+
+  helper: {
+    fontSize: 12,
+    color: "#9BA4B4",
+    marginTop: 4,
+  },
+
+  signupButton: {
+    marginTop: 32,
+    backgroundColor: "#1DA1F2",
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: "center",
+
+    shadowColor: "#1DA1F2",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.4,
+    shadowRadius: 10,
+    elevation: 10,
+  },
+
+  signupText: {
+    color: "#FFFFFF",
     fontSize: 16,
+    fontWeight: "700",
+  },
+
+  guestText: {
+    color: "#FFE66D",
+    textAlign: "center",
+    marginTop: 18,
     fontWeight: "600",
   },
-  linkText: {
-    marginTop: 16,
+
+  loginText: {
+    color: "#9BA4B4",
     textAlign: "center",
-    color: "#9ca3af",
+    marginTop: 22,
+    fontSize: 13,
+  },
+
+  loginLink: {
+    color: "#1DA1F2",
+    fontWeight: "700",
   },
 });
