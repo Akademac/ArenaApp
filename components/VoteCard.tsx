@@ -12,7 +12,6 @@ export type VoteCardProps = {
   initialVotesLeft: number;
   initialVotesRight: number;
   onVote?: (side: "left" | "right") => void;
-  description?: string; // 👈 novi prop
   commentsCount?: number;
   onOpenComments?: () => void;
 };
@@ -25,7 +24,6 @@ export default function VoteCard({
   onVote,
   commentsCount,
   onOpenComments,
-  description,
 }: VoteCardProps) {
   const [votesLeft, setVotesLeft] = useState(initialVotesLeft);
   const [votesRight, setVotesRight] = useState(initialVotesRight);
@@ -34,8 +32,6 @@ export default function VoteCard({
 
   const [previewSide, setPreviewSide] = useState<"left" | "right" | null>(null);
   const [ignoreNextPress, setIgnoreNextPress] = useState(false);
-
-  const [showDescription, setShowDescription] = useState(false); //modal description
 
   const leftFlex = useRef(new Animated.Value(0.5)).current;
   const rightFlex = useRef(new Animated.Value(0.5)).current;
@@ -48,9 +44,6 @@ export default function VoteCard({
   const rightOpacity = useRef(new Animated.Value(1)).current;
   const leftLoseScale = useRef(new Animated.Value(1)).current;
   const rightLoseScale = useRef(new Animated.Value(1)).current;
-
-  // desciption modal ref
-  const sheetTranslateY = useRef(new Animated.Value(40)).current;
 
   const totalVotes = votesLeft + votesRight;
 
@@ -96,19 +89,6 @@ export default function VoteCard({
     }).start();
   }, [visualLeft, visualRight, leftFlex, rightFlex]);
   //description modal effect
-  useEffect(() => {
-    if (showDescription) {
-      // kreni malo ispod i podigni sheet gore
-      sheetTranslateY.setValue(40);
-
-      Animated.spring(sheetTranslateY, {
-        toValue: 0,
-        useNativeDriver: true,
-        friction: 6,
-        tension: 40,
-      }).start();
-    }
-  }, [showDescription, sheetTranslateY]);
 
   // da li je strana vizuelno "zgusnuta"
   const leftCompressed = visualLeft <= MIN_SIDE + 0.02 && totalVotes > 0;
@@ -173,14 +153,7 @@ export default function VoteCard({
   return (
     <View style={styles.container}>
       {/* ℹ️ INFO BUTTON */}
-      {!showDescription && (
-        <Pressable
-          style={styles.infoIcon}
-          onPress={() => setShowDescription(true)}
-        >
-          <Text style={{ color: "#fff", fontSize: 14 }}>...</Text>
-        </Pressable>
-      )}
+
       <Animated.View
         style={[styles.duelContainer, { transform: [{ scale: cardScale }] }]}
       >
@@ -306,34 +279,6 @@ export default function VoteCard({
               {previewSide === "left" ? leftLabel : rightLabel}
             </Text>
           </View>
-        </View>
-      )}
-
-      {/* 🟨 BOTTOM SHEET — opis debate */}
-      {showDescription && (
-        <View style={styles.sheetOverlay}>
-          <Pressable
-            style={styles.sheetBackground}
-            onPress={() => setShowDescription(false)}
-          />
-
-          <Animated.View
-            style={[
-              styles.sheetContent,
-              { transform: [{ translateY: sheetTranslateY }] },
-            ]}
-          >
-            <View
-              style={{ width: "100%", alignItems: "center", marginBottom: 10 }}
-            >
-              <View style={styles.sheetHandle} />
-            </View>
-
-            <Text style={styles.sheetTitle}>Opis debate</Text>
-            <Text style={styles.sheetText}>
-              {description ?? "Nema dodatog opisa."}
-            </Text>
-          </Animated.View>
         </View>
       )}
     </View>
@@ -468,66 +413,6 @@ const styles = StyleSheet.create({
   previewTitle: {
     fontSize: 18,
     color: "#e5e7eb",
-    textAlign: "center",
-  },
-  infoIcon: {
-    position: "absolute",
-    top: 49,
-    left: 10,
-    zIndex: 99,
-    backgroundColor: "rgba(255,255,255,0.12)",
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
-  },
-
-  sheetOverlay: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
-    justifyContent: "flex-end",
-    backgroundColor: "rgba(0,0,0,0.35)",
-  },
-
-  sheetBackground: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
-  },
-
-  sheetContent: {
-    width: "100%",
-    backgroundColor: "#0d1117",
-    borderTopLeftRadius: 22,
-    borderTopRightRadius: 22,
-    paddingHorizontal: 20,
-    paddingVertical: 22,
-    minHeight: "28%",
-  },
-
-  sheetHandle: {
-    width: 50,
-    height: 5,
-    borderRadius: 999,
-    backgroundColor: "#444",
-  },
-
-  sheetTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#fff",
-    marginBottom: 10,
-    textAlign: "center",
-  },
-
-  sheetText: {
-    fontSize: 15,
-    color: "#d1d5db",
-    lineHeight: 21,
     textAlign: "center",
   },
 });

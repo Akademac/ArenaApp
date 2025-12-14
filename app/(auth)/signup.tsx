@@ -1,15 +1,11 @@
+import { useAuth } from "@/context/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useState } from "react";
-import {
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
 export default function Signup() {
+  const { signUp, loading, user } = useAuth();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -18,9 +14,31 @@ export default function Signup() {
   const [showPass, setShowPass] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
-  const handleSignup = () => {
-    console.log("SIGN UP:", { username, email, password });
-    // 🔥 ovde kasnije ide Firebase signup
+  const handleSignup = async () => {
+    if (!username || !email || !password || !confirm) {
+      alert("Popuni sva polja");
+      return;
+    }
+
+    if (password !== confirm) {
+      alert("Lozinke se ne poklapaju");
+      return;
+    }
+
+    if (password.length < 6) {
+      alert("Lozinka mora imati bar 6 karaktera");
+      return;
+    }
+
+    try {
+      await signUp(email, password);
+
+      // ✅ kad se user automatski setuje kroz onAuthStateChanged
+      // možemo direktno na home
+      router.replace("/(main)/home");
+    } catch (error: any) {
+      alert(error.message);
+    }
   };
 
   const handleGuest = () => {
@@ -30,13 +48,13 @@ export default function Signup() {
   return (
     <View style={styles.container}>
       {/* TITLE */}
-      <Text style={styles.title}>Create an Account</Text>
+      <Text style={styles.title}>Napravi profil</Text>
       <Text style={styles.subtitle}>
-        Create your account in seconds and start voting now!
+        Napravi profil vrlo brzo i kreni sa glasanjem
       </Text>
 
       {/* USERNAME */}
-      <Text style={styles.label}>User Name</Text>
+      <Text style={styles.label}>Ime korisnika</Text>
       <TextInput
         value={username}
         onChangeText={setUsername}
@@ -46,7 +64,7 @@ export default function Signup() {
       />
 
       {/* EMAIL */}
-      <Text style={styles.label}>Your Email</Text>
+      <Text style={styles.label}>Lozinka</Text>
       <TextInput
         value={email}
         onChangeText={setEmail}
@@ -58,7 +76,7 @@ export default function Signup() {
       />
 
       {/* PASSWORD */}
-      <Text style={styles.label}>Create a Password</Text>
+      <Text style={styles.label}>Napravi Lozinku</Text>
       <View style={styles.passwordWrapper}>
         <TextInput
           value={password}
@@ -76,10 +94,10 @@ export default function Signup() {
           />
         </Pressable>
       </View>
-      <Text style={styles.helper}>Password must be at least 8 characters.</Text>
+      <Text style={styles.helper}>Lozika mora sadrzati najmanje 8 karaktera</Text>
 
       {/* CONFIRM */}
-      <Text style={styles.label}>Retype Password</Text>
+      <Text style={styles.label}>Ponovi Lozinku</Text>
       <View style={styles.passwordWrapper}>
         <TextInput
           value={confirm}
@@ -97,22 +115,28 @@ export default function Signup() {
           />
         </Pressable>
       </View>
-      <Text style={styles.helper}>Password must be at least 8 characters.</Text>
+      <Text style={styles.helper}>Lozinka mora sadrzati najmanje 8 karaktera</Text>
 
       {/* SIGNUP BUTTON */}
-      <Pressable style={styles.signupButton} onPress={handleSignup}>
-        <Text style={styles.signupText}>Create Account</Text>
+      <Pressable
+        style={[styles.signupButton, loading && { opacity: 0.5 }]}
+        onPress={handleSignup}
+        disabled={loading}
+      >
+        <Text style={styles.signupText}>
+          {loading ? "Creating..." : "Create Account"}
+        </Text>
       </Pressable>
 
       {/* GUEST */}
       <Pressable onPress={handleGuest}>
-        <Text style={styles.guestText}>Continue as Guest</Text>
+        <Text style={styles.guestText}>Nastavi kao gost</Text>
       </Pressable>
 
       {/* LOGIN */}
       <Pressable onPress={() => router.push("/(auth)/login")}>
         <Text style={styles.loginText}>
-          Already have an account? <Text style={styles.loginLink}>Login</Text>
+          Vec imate profil? <Text style={styles.loginLink}>Login</Text>
         </Text>
       </Pressable>
     </View>
