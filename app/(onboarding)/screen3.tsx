@@ -38,7 +38,7 @@ export default function Screen1() {
       </View>
       <Pressable
         style={styles.next_btn}
-        onPress={() => router.push("/(auth)/signup")}
+        onPress={() => router.push("/(onboarding)/welcome")}
       >
         <MaterialIcons name="keyboard-arrow-right" size={34} color="white" />
       </Pressable>

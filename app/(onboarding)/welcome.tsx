@@ -1,8 +1,20 @@
 // app/(onboarding)/welcome.tsx
 import { router } from "expo-router";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useAuth } from "../../context/AuthContext";
 
 export default function Welcome() {
+  const { guestLogin } = useAuth();
+
+  const handleGuest = async () => {
+    try {
+      await guestLogin();
+      router.replace("/(main)/home");
+    } catch (e) {
+      console.log("Guest login error:", e);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Spremni?</Text>
@@ -14,21 +26,21 @@ export default function Welcome() {
       >
         <Text style={styles.btnText}>Napravi nalog</Text>
       </TouchableOpacity>
+
       <TouchableOpacity
         style={styles.btn}
         onPress={() => router.push("/(auth)/login")}
       >
         <Text style={styles.btnText}>Uloguj se</Text>
       </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.btn}
-        onPress={() => router.push("/(main)/home")}
-      >
+
+      <TouchableOpacity style={styles.btn} onPress={handleGuest}>
         <Text style={styles.btnText}>Nastavi kao gost</Text>
       </TouchableOpacity>
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
